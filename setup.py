@@ -32,6 +32,7 @@ setup(
     extras_require={
         'dev': [
             'Trionyx',
+            'colorlog',
             'django-extensions',
             'django-debug-toolbar',
             'Werkzeug',

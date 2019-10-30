@@ -45,11 +45,39 @@ shell:
 
 
 lint:
-	-$(FLAKE8) trionyx
-	-$(PYDOCSTYLE) trionyx
-	-$(FLAKE8) tests
+	-$(FLAKE8) trionyx_accounts
+	-$(PYDOCSTYLE) trionyx_accounts
 
 
 
 test: lint
 	$(COVERAGE) run manage.py test tests
+
+
+
+run:
+	@( \
+		. env/bin/activate; \
+		python manage.py runserver_plus; \
+	)
+
+
+
+celery:
+	@( \
+		. env/bin/activate; \
+		celery worker -A app.celery -B -l info; \
+	)
+
+
+
+locales_update:
+	@( \
+	    . env/bin/activate; \
+	    python$(PY_VERSION) manage.py makemessages -l 'en_US' -i 'env/*' --no-obsolete; \
+	    python$(PY_VERSION) manage.py makemessages -l 'nl_NL' -i 'env/*' --no-obsolete; \
+    )
+
+
+locales_compile:
+	@(. env/bin/activate; python$(PY_VERSION) manage.py compilemessages -l en_US -l nl_NL)
