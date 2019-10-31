@@ -26,10 +26,10 @@ class Account(models.BaseModel):
     """Account model"""
 
     type = models.ForeignKey(
-        models.get_name(AccountType), models.SET_NULL,
+        AccountType, models.SET_NULL,
         null=True, blank=True, related_name='accounts', verbose_name=_('Type'))
     assigned_user = models.ForeignKey(
-        models.get_name('trionyx.user'), models.SET_NULL,
+        'trionyx.user', models.SET_NULL,
         null=True, blank=True, related_name='assigned_accounts', verbose_name=_('Assigned user'))
 
     name = models.CharField(_('Name'), max_length=255)
@@ -41,10 +41,10 @@ class Account(models.BaseModel):
     description = models.TextField(_('Description'), default='', blank=True)
 
     billing_address = models.ForeignKey(
-        models.get_name('trionyx_accounts.address'), models.SET_NULL,
+        'trionyx_accounts.address', models.SET_NULL,
         null=True, blank=True, related_name='+', verbose_name=_('Billing address'))
     shipping_address = models.ForeignKey(
-        models.get_name('trionyx_accounts.address'), models.SET_NULL,
+        'trionyx_accounts.address', models.SET_NULL,
         null=True, blank=True, related_name='+', verbose_name=_('Shipping address'))
 
     class Meta:
@@ -58,10 +58,10 @@ class Contact(models.BaseModel):
     """Contact model"""
 
     account = models.ForeignKey(
-        models.get_name(Account), models.CASCADE,
+        Account, models.CASCADE,
         related_name='contacts', verbose_name=_('Account'))
     assigned_user = models.ForeignKey(
-        models.get_name('trionyx.user'), models.SET_NULL,
+       'trionyx.user', models.SET_NULL,
         null=True, blank=True, related_name='assigned_contacts', verbose_name=_('Assigned user'))
 
     first_name = models.CharField(_('First name'), max_length=255)
@@ -74,7 +74,7 @@ class Contact(models.BaseModel):
     description = models.TextField(_('Description'), default='', blank=True)
 
     address = models.ForeignKey(
-        models.get_name('trionyx_accounts.address'), models.SET_NULL,
+        'trionyx_accounts.address', models.SET_NULL,
         null=True, blank=True, related_name='+', verbose_name=_('Address'))
 
     class Meta:
@@ -92,7 +92,7 @@ class Address(models.BaseModel):
     """Address model"""
 
     account = models.ForeignKey(
-        models.get_name(Account), models.CASCADE,
+        Account, models.CASCADE,
         related_name='addresses', verbose_name=_('Account'))
 
     street = models.CharField(_('Street'), max_length=255, default='', blank=True)
