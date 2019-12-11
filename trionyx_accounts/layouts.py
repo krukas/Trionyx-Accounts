@@ -106,7 +106,7 @@ def order_general(obj):
                         {
                             'label': _('Options'),
                             'width': '200px',
-                            'component': ButtonGroup(
+                            'value': ButtonGroup(
                                 Button(
                                     label=_('Update'),
                                     model_url='dialog-edit',

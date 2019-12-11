@@ -79,7 +79,7 @@ class AccountForm(forms.ModelForm):
         """Form meta"""
 
         model = Account
-        fields = ['type', 'assigned_user', 'name', 'debtor_id', 'website', 'phone', 'email', 'description']
+        fields = ['type', 'assigned_user', 'name', 'website', 'phone', 'email', 'description']
 
     def __init__(self, *args, **kwargs):
         """Init form"""
@@ -103,10 +103,6 @@ class AccountForm(forms.ModelForm):
                     Div(
                         Div(
                             'type',
-                            css_class='col-md-6'
-                        ),
-                        Div(
-                            'debtor_id',
                             css_class='col-md-6'
                         ),
                         css_class='row',

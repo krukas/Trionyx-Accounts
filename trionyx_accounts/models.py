@@ -7,7 +7,10 @@ trionyx_accounts.models
 """
 from trionyx import models
 from trionyx.data import COUNTRIES
+from trionyx.config import variables
 from django.utils.translation import ugettext_lazy as _
+
+from .conf import settings as app_settings
 
 
 class AccountType(models.BaseModel):
@@ -33,7 +36,6 @@ class Account(models.BaseModel):
         null=True, blank=True, related_name='assigned_accounts', verbose_name=_('Assigned user'))
 
     name = models.CharField(_('Name'), max_length=255)
-    # TODO Make option to auto generate debtor number WorkBundle?
     debtor_id = models.CharField(_('Debtor id'), max_length=64, default='', blank=True)
     website = models.URLField(_('Website'), default='', blank=True)
     phone = models.CharField(_('Phone'), max_length=32, default='', blank=True)
@@ -52,6 +54,18 @@ class Account(models.BaseModel):
 
         verbose_name = _('Account')
         verbose_name_plural = _('Accounts')
+
+    def save(self, *args, **kwargs):
+        """Save account"""
+        if not self.debtor_id:
+            with variables.get_increment('accounts_account_increment') as increment:
+                self.debtor_id = app_settings.DEBTOR_ID_FORMAT.format(
+                    increment=increment,
+                    increment_long=str(increment).zfill(8),
+                )
+                super().save(*args, **kwargs)
+        else:
+            super().save(*args, **kwargs)
 
 
 class Contact(models.BaseModel):
