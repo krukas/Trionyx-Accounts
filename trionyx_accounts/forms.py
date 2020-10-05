@@ -13,73 +13,15 @@ from django.utils.translation import ugettext_lazy as _
 from .models import Account, Address, Contact
 
 
-class AddressForm(forms.ModelForm):
-    """Address form"""
-
-    class Meta:
-        """Form meta"""
-
-        model = Address
-        fields = ['street', 'city', 'postcode', 'country', 'state']
-
-    def save(self, commit=True):
-        """Save form"""
-        self.is_valid()
-        if not list(filter(None, self.cleaned_data.values())):
-            return None
-        return super().save(commit)
-
-    def __init__(self, *args, **kwargs):
-        """Init form"""
-        super().__init__(*args, **kwargs)
-        self.helper = FormHelper()
-        self.helper.layout = Layout(
-            'street',
-            Div(
-                Div(
-                    'postcode',
-                    css_class='col-md-6'
-                ),
-                Div(
-                    'city',
-                    css_class='col-md-6'
-                ),
-                css_class='row',
-            ),
-            Div(
-                Div(
-                    'state',
-                    css_class='col-md-6'
-                ),
-                Div(
-                    'country',
-                    css_class='col-md-6'
-                ),
-                css_class='row',
-            ),
-        )
-
-
 @forms.register(default_create=True, default_edit=True)
 class AccountForm(forms.ModelForm):
     """Account form"""
-
-    inline_forms = {
-        'billing_address': {
-            'form': AddressForm,
-            'fk_name': 'account',
-        },
-        'shipping_address': {
-            'form': AddressForm,
-            'fk_name': 'account',
-        }
-    }
 
     class Meta:
         """Form meta"""
 
         model = Account
-        fields = ['type', 'assigned_user', 'name', 'website', 'phone', 'email', 'description']
+        fields = ['type', 'assigned_user', 'name', 'website', 'phone', 'email', 'description', 'billing_address', 'shipping_address']
 
     def __init__(self, *args, **kwargs):
         """Init form"""
@@ -118,6 +60,17 @@ class AccountForm(forms.ModelForm):
                         ),
                         css_class='row',
                     ),
+                    Div(
+                        Div(
+                            'billing_address',
+                            css_class='col-md-6'
+                        ),
+                        Div(
+                            'shipping_address',
+                            css_class='col-md-6'
+                        ),
+                        css_class='row',
+                    ),
                     css_class='col-md-6',
                 ),
                 Fieldset(
@@ -126,19 +79,6 @@ class AccountForm(forms.ModelForm):
                     'description',
                     css_class='col-md-6',
                 ),
-            ),
-            Div(
-                Fieldset(
-                    _('Billing address'),
-                    InlineForm('billing_address'),
-                    css_class='col-md-6'
-                ),
-                Fieldset(
-                    _('Shipping address'),
-                    InlineForm('shipping_address'),
-                    css_class='col-md-6'
-                ),
-                css_class='row'
             ),
         )
 
@@ -211,3 +151,78 @@ class ContactForm(forms.ModelForm):
             ),
             'description'
         )
+
+
+@forms.register(default_create=True, default_edit=True)
+class AddressForm(forms.ModelForm):
+    """Address form"""
+
+    account = forms.ModelChoiceField(queryset=Account.objects.all(), widget=forms.HiddenInput())
+    default_shipping = forms.BooleanField(required=False, initial=False)
+    default_billing = forms.BooleanField(required=False, initial=False)
+
+    class Meta:
+        """Form meta"""
+
+        model = Address
+        fields = ['account', 'street', 'city', 'postcode', 'country', 'state']
+
+    def __init__(self, *args, **kwargs):
+        """Init form"""
+        super().__init__(*args, **kwargs)
+
+        if self.instance and self.instance.id:
+            account = self.instance.account
+            self.initial['default_shipping'] = self.instance == account.shipping_address
+            self.initial['default_billing'] = self.instance == account.billing_address
+        elif 'account' in self.initial:
+            account = Account.objects.get(id=self.initial['account'])
+            if not account.shipping_address:
+                self.initial['default_shipping'] = True
+            if not account.billing_address:
+                self.initial['default_billing'] = True
+
+        self.helper = FormHelper()
+        self.helper.layout = Layout(
+            'account',
+            'street',
+            Div(
+                Div(
+                    'postcode',
+                    css_class='col-md-6'
+                ),
+                Div(
+                    'city',
+                    css_class='col-md-6'
+                ),
+                css_class='row',
+            ),
+            Div(
+                Div(
+                    'state',
+                    css_class='col-md-6'
+                ),
+                Div(
+                    'country',
+                    css_class='col-md-6'
+                ),
+                css_class='row',
+            ),
+            'default_shipping',
+            'default_billing'
+        )
+
+    def save(self, commit=True):
+        obj = super().save(commit)
+
+        save_account = False
+        if self.cleaned_data['default_shipping']:
+            obj.account.shipping_address = obj
+            save_account = True
+
+        if self.cleaned_data['default_billing']:
+            obj.account.billing_address = obj
+            save_account = True
+
+        if save_account:
+            obj.account.save(update_fields=['shipping_address', 'billing_address'])

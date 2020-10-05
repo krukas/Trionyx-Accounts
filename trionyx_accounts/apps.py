@@ -6,7 +6,14 @@ trionyx_accounts.apps
 :license: GPLv3
 """
 from trionyx.trionyx.apps import BaseConfig
+from django.utils.translation import ugettext_lazy as _
 
+
+def get_add_address_url(obj, context):
+    from trionyx.urls import model_url
+    return model_url('trionyx_accounts.address', 'dialog-create', params={
+        'account': obj.id,
+    })
 
 class AccountsConfig(BaseConfig):
     """Django core config app"""
@@ -24,6 +31,19 @@ class AccountsConfig(BaseConfig):
         menu_order = 5
 
         list_default_fields = ['type', 'name', 'website', 'email', 'phone', 'debtor_id']
+
+        header_buttons = [
+            {
+                'label': _('Add Address'),
+                'url': get_add_address_url,
+                'type': 'bg-theme',
+                'show': lambda obj, context: context.get('page') == 'view' and context.get('tab') == 'general',
+                'dialog': True,
+                'dialog_options': {
+                    'callback': "function(data, dialog) { if (data.success) { trionyx_reload_tab('general'); dialog.close(); } }",
+                }
+            }
+        ]
 
     class AccountType:
         """Account type config"""

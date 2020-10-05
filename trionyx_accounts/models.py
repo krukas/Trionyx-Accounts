@@ -5,6 +5,7 @@ trionyx_accounts.models
 :copyright: 2019 by Maikel Martens
 :license: GPLv3
 """
+from django.conf import settings
 from trionyx import models
 from trionyx.data import COUNTRIES
 from trionyx.config import variables
@@ -32,7 +33,7 @@ class Account(models.BaseModel):
         AccountType, models.SET_NULL,
         null=True, blank=True, related_name='accounts', verbose_name=_('Type'))
     assigned_user = models.ForeignKey(
-        'trionyx.user', models.SET_NULL,
+        settings.AUTH_USER_MODEL, models.SET_NULL,
         null=True, blank=True, related_name='assigned_accounts', verbose_name=_('Assigned user'))
 
     name = models.CharField(_('Name'), max_length=255)
@@ -75,7 +76,7 @@ class Contact(models.BaseModel):
         Account, models.CASCADE,
         related_name='contacts', verbose_name=_('Account'))
     assigned_user = models.ForeignKey(
-       'trionyx.user', models.SET_NULL,
+       settings.AUTH_USER_MODEL, models.SET_NULL,
         null=True, blank=True, related_name='assigned_contacts', verbose_name=_('Assigned user'))
 
     first_name = models.CharField(_('First name'), max_length=255)
@@ -109,11 +110,11 @@ class Address(models.BaseModel):
         Account, models.CASCADE,
         related_name='addresses', verbose_name=_('Account'))
 
-    street = models.CharField(_('Street'), max_length=255, default='', blank=True)
-    city = models.CharField(_('City'), max_length=255, default='', blank=True)
+    street = models.CharField(_('Street'), max_length=255)
+    city = models.CharField(_('City'), max_length=255)
     state = models.CharField(_('State'), max_length=255, default='', blank=True)
     postcode = models.CharField(_('Postcode'), max_length=32, default='', blank=True)
-    country = models.CharField(_('Country'), max_length=2, choices=COUNTRIES, default='', blank=True)
+    country = models.CharField(_('Country'), max_length=2, choices=COUNTRIES)
 
     class Meta:
         """Model meta"""
