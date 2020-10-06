@@ -7,7 +7,7 @@ trionyx_accounts.forms
 """
 from trionyx import forms
 from trionyx.forms.helper import FormHelper
-from trionyx.forms.layout import Layout, Fieldset, Div, InlineForm
+from trionyx.forms.layout import Layout, Fieldset, Div
 from django.utils.translation import ugettext_lazy as _
 
 from .models import Account, Address, Contact
@@ -26,6 +26,14 @@ class AccountForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         """Init form"""
         super().__init__(*args, **kwargs)
+
+        if self.instance and self.instance.id:
+            self.fields['billing_address'].queryset = Address.objects.filter(account=self.instance)
+            self.fields['shipping_address'].queryset = Address.objects.filter(account=self.instance)
+        else:
+            self.fields['billing_address'].queryset = Address.objects.filter(account_id=-1)
+            self.fields['shipping_address'].queryset = Address.objects.filter(account_id=-1)
+
         self.helper = FormHelper()
         self.helper.layout = Layout(
             Div(
@@ -101,6 +109,14 @@ class ContactForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         """Init form"""
         super().__init__(*args, **kwargs)
+
+        if self.instance and self.instance.id:
+            self.fields['address'].queryset = Address.objects.filter(account=self.instance.account)
+        elif 'account' in self.initial:
+            self.fields['address'].queryset = Address.objects.filter(account_id=self.initial['account'])
+        elif self.data and 'account' in self.data:
+            self.fields['address'].queryset = Address.objects.filter(account_id=self.data['account'])
+
         self.fields['description'].widget.attrs['rows'] = 3
         self.helper = FormHelper()
         self.helper.layout = Layout(

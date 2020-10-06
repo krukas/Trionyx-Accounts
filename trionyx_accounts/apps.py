@@ -36,7 +36,6 @@ class AccountsConfig(BaseConfig):
             {
                 'label': _('Add Address'),
                 'url': get_add_address_url,
-                'type': 'bg-theme',
                 'show': lambda obj, context: context.get('page') == 'view' and context.get('tab') == 'general',
                 'dialog': True,
                 'dialog_options': {
