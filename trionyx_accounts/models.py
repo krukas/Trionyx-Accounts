@@ -76,7 +76,7 @@ class Contact(models.BaseModel):
         Account, models.CASCADE,
         related_name='contacts', verbose_name=_('Account'))
     assigned_user = models.ForeignKey(
-       settings.AUTH_USER_MODEL, models.SET_NULL,
+        settings.AUTH_USER_MODEL, models.SET_NULL,
         null=True, blank=True, related_name='assigned_contacts', verbose_name=_('Assigned user'))
 
     first_name = models.CharField(_('First name'), max_length=255)

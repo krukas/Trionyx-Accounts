@@ -229,6 +229,7 @@ class AddressForm(forms.ModelForm):
         )
 
     def save(self, commit=True):
+        """Save model and set default shipping and billing"""
         obj = super().save(commit)
 
         save_account = False

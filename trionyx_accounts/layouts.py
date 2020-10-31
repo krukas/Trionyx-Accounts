@@ -6,7 +6,7 @@ trionyx_accounts.layouts
 :license: GPLv3
 """
 from trionyx.views import tabs
-from trionyx.layout import Container, Row, Column3, Column9, Panel, DescriptionList, Html, Button, Table, ButtonGroup, Component, TableDescription
+from trionyx.layout import Container, Row, Column3, Column9, Panel, DescriptionList, Html, Button, Table, ButtonGroup, Component
 from django.utils.translation import ugettext_lazy as _
 
 from .models import Account, Contact

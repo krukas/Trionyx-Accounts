@@ -10,10 +10,12 @@ from django.utils.translation import ugettext_lazy as _
 
 
 def get_add_address_url(obj, context):
+    """Get add address url"""
     from trionyx.urls import model_url
     return model_url('trionyx_accounts.address', 'dialog-create', params={
         'account': obj.id,
     })
+
 
 class AccountsConfig(BaseConfig):
     """Django core config app"""
