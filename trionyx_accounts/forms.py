@@ -174,8 +174,8 @@ class AddressForm(forms.ModelForm):
     """Address form"""
 
     account = forms.ModelChoiceField(queryset=Account.objects.all(), widget=forms.HiddenInput())
-    default_shipping = forms.BooleanField(required=False, initial=False)
-    default_billing = forms.BooleanField(required=False, initial=False)
+    default_shipping = forms.BooleanField(label=_('Default shipping'), required=False, initial=False)
+    default_billing = forms.BooleanField(label=_('Default billing'), required=False, initial=False)
 
     class Meta:
         """Form meta"""
